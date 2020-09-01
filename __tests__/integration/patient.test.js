@@ -67,9 +67,9 @@ describe('GET /api/patients/:id', () => {
     expect(response.body.name).toBe(patient.name);
   });
   it('should return 404 when trying to get a non-existing patient', async () => {
-    const patient = await factory.create('Patient');
+    await factory.create('Patient');
     const response = await request(app).get(
-      `/api/patients/${patient._id + 22222}`
+      `/api/patients/5f4e967b47b595b4038197f7`
     );
     expect(response.status).toBe(404);
   });
@@ -87,14 +87,24 @@ describe('PUT /api/patients/:id', () => {
     expect(response.body.name).toBe(name);
   });
   it('should return 404 when trying to update a non-existing patient', async () => {
-    const patient = await factory.create('Patient');
+    await factory.create('Patient');
     const response = await request(app)
-      .patch(`/api/patients/${patient._id + 22222}`)
+      .patch(`/api/patients/5f4e967b47b595b4038197f7`)
       .send({
         name: 'New Name',
       });
     expect(response.status).toBe(404);
   });
+  it('should return 400 when trying to update an existing patient with a required field empty', async () => {
+    const patient = await factory.create('Patient');
+    const response = await request(app)
+      .patch(`/api/patients/${patient._id}`)
+      .send({
+        name: '',
+      });
+    expect(response.status).toBe(400);
+  });
+
 });
 
 describe('DELETE /api/patients/:id', () => {
@@ -104,8 +114,10 @@ describe('DELETE /api/patients/:id', () => {
     expect(response.status).toBe(204);
   });
   it('should return 404 when trying to update a non-existing patient', async () => {
-    const patient = await factory.create('Patient');
-    const response = await request(app).delete(`/api/patients/${patient._id+999}`);
+    await factory.create('Patient');
+    const response = await request(app).delete(
+      `/api/patients/5f4e967b47b595b4038197f7`
+    );
     expect(response.status).toBe(404);
   });
 });
