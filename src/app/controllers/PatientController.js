@@ -1,7 +1,12 @@
 const Patient = require('../models/Patient');
+const { validationResult } = require('express-validator');
 
 module.exports = {
   async store(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     try {
       const patient = await Patient.create(req.body);
       return res.json(patient);
